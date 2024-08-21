@@ -14,12 +14,11 @@
 """Lightweight component tuning function."""
 from typing import NamedTuple
 
-from kfp.v2.dsl import component
+from kfp.dsl import component
 
 
 @component(
     base_image="python:3.8",
-    output_component_file="covertype_kfp_tune_hyperparameters.yaml",
     packages_to_install=["google-cloud-aiplatform"],
 )
 def tune_hyperparameters(
@@ -35,7 +34,6 @@ def tune_hyperparameters(
     "Outputs",
     [("best_accuracy", float), ("best_alpha", float), ("best_max_iter", int)],
 ):
-
     # pylint: disable=import-outside-toplevel
     from google.cloud import aiplatform
     from google.cloud.aiplatform import hyperparameter_tuning as hpt
@@ -48,8 +46,9 @@ def tune_hyperparameters(
         {
             "machine_spec": {
                 "machine_type": "n1-standard-4",
-                "accelerator_type": "NVIDIA_TESLA_K80",
-                "accelerator_count": 1,
+                # Enable if you want to use GPU.
+                # "accelerator_type": "NVIDIA_TESLA_K80",
+                # "accelerator_count": 1,
             },
             "replica_count": 1,
             "container_spec": {
@@ -76,7 +75,7 @@ def tune_hyperparameters(
         },
         parameter_spec={
             "alpha": hpt.DoubleParameterSpec(
-                min=1.0e-4, max=1.0e-1, scale="linear"
+                min=1.0e-4, max=1.0e-1, scale="log"
             ),
             "max_iter": hpt.DiscreteParameterSpec(
                 values=[1, 2], scale="linear"

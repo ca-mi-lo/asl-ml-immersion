@@ -30,4 +30,29 @@ gcloud services enable \
   artifactregistry.googleapis.com \
   cloudbuild.googleapis.com \
   container.googleapis.com \
-  dataflow.googleapis.com
+  dataflow.googleapis.com \
+  run.googleapis.com
+
+# Setup Artifact Registry
+export PROJECT_ID=$(gcloud config get-value project)
+export BUCKET=$PROJECT_ID
+export MULTIREGION=us
+export REGION=us-central1
+export ARTIFACT_REG_REPO=asl-artifact-repo
+
+if ! gcloud artifacts repositories describe $ARTIFACT_REG_REPO \
+       --location=$MULTIREGION > /dev/null 2>&1; then
+    gcloud artifacts repositories create $ARTIFACT_REG_REPO \
+    --project=$PROJECT_ID --location=$MULTIREGION --repository-format=docker
+fi
+
+# Create a GCS bucket
+exists=$(gsutil ls -d | grep -w gs://${BUCKET}/)
+if [ -n "$exists" ]; then
+    echo -e "Bucket exists, let's not recreate it."
+else
+    echo "Creating a new GCS bucket."
+    gsutil mb -l ${REGION} gs://${BUCKET}
+    echo "Here are your current buckets:"
+    gsutil ls
+fi

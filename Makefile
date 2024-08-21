@@ -15,10 +15,10 @@
 all: clean install
 
 kernels: \
- reinforcement_learning_kernel \
- tf_recommenders_kernel \
  object_detection_kernel \
- pytorch_kfp_kernel
+ pytorch_kfp_kernel \
+ langchain_kernel \
+ langchain_components_kernel
 
 .PHONY: clean
 clean:
@@ -31,7 +31,7 @@ clean:
 install:
 	@pip install --user -U pip
 	@pip install --user "Cython<3"
-	@pip install --user -r requirements.txt
+	@pip install --user -e .
 	@pip install --user --no-deps -r requirements-without-deps.txt
 	@./scripts/setup_on_jupyterlab.sh
 	@pre-commit install
@@ -41,13 +41,17 @@ install:
 precommit:
 	@pre-commit run --all-files
 
-.PHONY: reinforcement_learning_kernel
-reinforcement_learning_kernel:
-	./kernels/reinforcement_learning.sh
+.PHONY: asl_kernel
+asl_kernel:
+	./kernels/asl_kernel.sh
 
-.PHONY: tf_recommenders_kernel
-tf_recommenders_kernel:
-	./kernels/tf_recommenders.sh
+.PHONY: langchain_kernel
+langchain_kernel:
+	./kernels/langchain.sh
+
+.PHONY: langchain_components_kernel
+langchain_components_kernel:
+	./kernels/langchain_components.sh
 
 .PHONY: object_detection_kernel
 object_detection_kernel:
@@ -56,3 +60,12 @@ object_detection_kernel:
 .PHONY: pytorch_kfp_kernel
 pytorch_kfp_kernel:
 	./kernels/pytorch_kfp.sh
+
+.PHONY: gemini_kernel
+gemini_kernel:
+	./kernels/gemini.sh
+
+
+.PHONY: tests
+tests:
+	pytest tests/unit

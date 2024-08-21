@@ -12,13 +12,12 @@
 # express or implied. See the License for the specific language governing
 # permissions and limitations under the License.
 """Lightweight component training function."""
-from kfp.v2.dsl import component
+from kfp.dsl import component
 
 
 # pylint: disable=unused-argument
 @component(
     base_image="python:3.8",
-    output_component_file="covertype_kfp_train_and_deploy.yaml",
     packages_to_install=["google-cloud-aiplatform"],
 )
 def train_and_deploy(
@@ -32,7 +31,6 @@ def train_and_deploy(
     alpha: float,
     max_iter: int,
 ):
-
     # pylint: disable-next=import-outside-toplevel
     from google.cloud import aiplatform
 
